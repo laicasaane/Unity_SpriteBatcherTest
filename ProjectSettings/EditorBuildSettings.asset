@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/SpriteBatcherTest.unity
+    guid: 0bbba7f9fb682364cbcc8dee0e5470d7
+  - enabled: 0
     path: Assets/Scenes/SpriteBatcherJobifiedTest.unity
     guid: 1b5643918639bc942a7ba09890ca0f7c
   m_configObjects: {}
