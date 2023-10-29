@@ -60,9 +60,6 @@ namespace vadersb.utils.unity.jobs
             Debug.Assert(itemsCount <= items.Length);
             Debug.Assert(itemsCount >= 0);
             
-            int verticesCount = itemsCount * 4;
-            int indicesCount = itemsCount * 6;
-            
             //arrays allocation
             m_VerticesArray = new NativeArray<RenderableJobsUtils.QuadVertexData>(itemsCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             m_IndicesArray = new NativeArray<RenderableJobsUtils.QuadIndexData>(itemsCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);

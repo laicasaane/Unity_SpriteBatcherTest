@@ -32,48 +32,48 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
         //-----
         //IRenderable
 
-        public bool IsVisible()
+        public readonly bool IsVisible()
         {
             return true;
         }
 
-        public int GetSpriteIndex()
+        public readonly int GetSpriteIndex()
         {
             return m_SpriteIndex;
         }
 
 
-        public float2 GetPosition()
+        public readonly float2 GetPosition()
         {
             return m_Position;
         }
 
 
-        public float2 GetScale()
+        public readonly float2 GetScale()
         {
             return new float2(m_Scale, m_Scale);
         }
 
 
-        public float GetRotationAngle()
+        public readonly float GetRotationAngle()
         {
             return m_Angle;
         }
 
 
-        public Color GetColor()
+        public readonly Color GetColor()
         {
             return m_Color;
         }
 
-        public int CompareTo(Particle other)
+        public readonly int CompareTo(Particle other)
         {
             return other.m_Position.y.CompareTo(m_Position.y);
         }
 
         public readonly struct Comparer : IComparer<Particle>
         {
-            public static readonly Comparer Defaut = new Comparer();
+            public static readonly Comparer Defaut = new();
 
             public int Compare(Particle x, Particle y)
             {
@@ -93,13 +93,6 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
 
     [SerializeField]
     private float m_SpeedMax = 1.0f;
-
-    [Header("Scale")]
-    [SerializeField]
-    private float m_ScaleMin = 0.5f;
-
-    [SerializeField]
-    private float m_ScaleMax = 2.0f;
 
     [Header("Sprites count")]
     [SerializeField]
@@ -131,7 +124,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
-        QualitySettings.vSyncCount = (int)Screen.currentResolution.refreshRate / Application.targetFrameRate;
+        QualitySettings.vSyncCount = (int)Screen.currentResolution.refreshRateRatio.value / Application.targetFrameRate;
 
         m_BatchRenderSetup = GetComponent<SpriteBatchRenderSetup>();
         Debug.Assert(m_BatchRenderSetup != null);
@@ -175,14 +168,14 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
 
 
         //particles update job
-        var updateJob = new ParticlesUpdateJob(
-              m_Particles
-            , new float2(minX, maxX)
-            , new float2(minY, maxY)
-            , deltaTime
-            , m_SpeedMin
-            , m_SpeedMax
-        );
+        var updateJob = new ParticlesUpdateJob {
+              particles = m_Particles
+            , boundsX = new float2(minX, maxX)
+            , boundsY = new float2(minY, maxY)
+            , deltaTime = deltaTime
+            , speedMin = m_SpeedMin
+            , speedMax = m_SpeedMax
+        };
 
         var jobHandle = updateJob.Schedule(m_Particles.Length, m_UpdateBatchCount);
 
@@ -219,7 +212,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
 
     private void GenerateParticles()
     {
-        WeightedRandomizer<Color> randomizer = new WeightedRandomizer<Color>();
+        var randomizer = new WeightedRandomizer<Color>();
 
         randomizer.AddValue(new Color32(113, 209, 129, 255), 1.0f);
         randomizer.AddValue(new Color32(250, 128, 114, 255), 1.0f);
@@ -279,43 +272,28 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
     {
         //-----
         //input data
-        private NativeArray<Particle> m_Particles;
+        public NativeArray<Particle> particles;
 
-        private float2 m_BoundsX;
-        private float2 m_BoundsY;
+        public float2 boundsX;
+        public float2 boundsY;
 
-        private float m_DeltaTime;
+        public float deltaTime;
 
-        private float m_SpeedMin;
-        private float m_SpeedMax;
-
-
-        public ParticlesUpdateJob(NativeArray<Particle> particles, float2 boundsX, float2 boundsY, float deltaTime, float speedMin, float speedMax)
-        {
-            m_Particles = particles;
-
-            m_BoundsX = boundsX;
-            m_BoundsY = boundsY;
-
-            m_DeltaTime = deltaTime;
-
-            m_SpeedMin = speedMin;
-            m_SpeedMax = speedMax;
-        }
-
+        public float speedMin;
+        public float speedMax;
 
         public void Execute(int index)
         {
-            var particle = m_Particles[index];
+            var particle = particles[index];
 
             //speed
-            float curSpeed = math.lerp(m_SpeedMin, m_SpeedMax, particle.m_SpeedMult) * m_DeltaTime;
+            float curSpeed = math.lerp(speedMin, speedMax, particle.m_SpeedMult) * deltaTime;
 
             //moving and bouncing
             if (particle.m_HorLeft == true)
             {
                 particle.m_Position.x -= curSpeed;
-                if (particle.m_Position.x <= m_BoundsX.x)
+                if (particle.m_Position.x <= boundsX.x)
                 {
                     particle.m_HorLeft = false;
                 }
@@ -323,7 +301,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
             else
             {
                 particle.m_Position.x += curSpeed;
-                if (particle.m_Position.x >= m_BoundsX.y)
+                if (particle.m_Position.x >= boundsX.y)
                 {
                     particle.m_HorLeft = true;
                 }
@@ -333,7 +311,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
             if (particle.m_VerUp == true)
             {
                 particle.m_Position.y += curSpeed;
-                if (particle.m_Position.y >= m_BoundsY.y)
+                if (particle.m_Position.y >= boundsY.y)
                 {
                     particle.m_VerUp = false;
                 }
@@ -341,7 +319,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
             else
             {
                 particle.m_Position.y -= curSpeed;
-                if (particle.m_Position.y <= m_BoundsY.x)
+                if (particle.m_Position.y <= boundsY.x)
                 {
                     particle.m_VerUp = true;
                 }
@@ -353,7 +331,7 @@ public class SimpleSpritesSimulatorJobified : MonoBehaviour
 
 
             //finally - storing the updated particle
-            m_Particles[index] = particle;
+            particles[index] = particle;
         }
     }
 

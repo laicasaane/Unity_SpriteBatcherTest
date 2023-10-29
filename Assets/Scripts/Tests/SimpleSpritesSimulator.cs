@@ -69,7 +69,7 @@ public class SimpleSpritesSimulator : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 60;
-        QualitySettings.vSyncCount = (int)Screen.currentResolution.refreshRate / Application.targetFrameRate;
+        QualitySettings.vSyncCount = (int)Screen.currentResolution.refreshRateRatio.value / Application.targetFrameRate;
     }
 
     // Start is called before the first frame update
