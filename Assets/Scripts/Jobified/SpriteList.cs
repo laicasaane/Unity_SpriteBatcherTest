@@ -14,11 +14,11 @@ namespace vadersb.utils.unity.jobs
         private NativeArray<SpriteData> m_SpriteDataArray;
 
         private Texture m_Texture = null;
-        
+
         public void Init()
         {
             Debug.Assert(m_Sprites != null);
-            
+
             //0. texture
             if (m_Sprites.Count == 0)
             {
@@ -28,7 +28,7 @@ namespace vadersb.utils.unity.jobs
             {
                 m_Texture = m_Sprites[0].texture;
             }
-            
+
             //1. sprites list validation
             foreach (var sprite in m_Sprites)
             {
@@ -52,13 +52,13 @@ namespace vadersb.utils.unity.jobs
                     Debug.LogError("Sprite " + sprite.name + " is tightly packed! Only rectangle packing is supported for sprite batching!");
                 }
             }
-            
+
             //2. sprite data array init
             if (m_SpriteDataArray.IsCreated)
             {
                 m_SpriteDataArray.Dispose();
             }
-            
+
             m_SpriteDataArray = new NativeArray<SpriteData>(m_Sprites.Count, Allocator.Persistent, NativeArrayOptions.ClearMemory);
 
             for (int i = 0; i < m_Sprites.Count; i++)
@@ -72,7 +72,7 @@ namespace vadersb.utils.unity.jobs
         {
             m_SpriteDataArray.Dispose();
         }
-        
+
         public int SpritesCount
         {
             get
@@ -94,5 +94,5 @@ namespace vadersb.utils.unity.jobs
 
 
     }
-    
+
 }

@@ -12,7 +12,7 @@ namespace vadersb.utils.unity.jobs
         //Using renderer.SetPropertyBlock(), we can apply our new values to the renderer.
         //Job done! However, it is important to note that setting a property block on a renderer
         //overwrites any other data set by property blocks on that renderer.
-        //If your new property block doesn't hold a value that was present before, that value will be reset. 
+        //If your new property block doesn't hold a value that was present before, that value will be reset.
 
         [SerializeField]
         private SpriteList m_SpriteList;
@@ -27,11 +27,11 @@ namespace vadersb.utils.unity.jobs
 
         //mesh
         private Mesh m_Mesh;
-        
+
         //material properties block
         private MaterialPropertyBlock m_MaterialPropertyBlock;
-        
-        
+
+
         private static readonly int s_ColorProperty = Shader.PropertyToID("_RendererColor");
         private static readonly int s_TextureProperty = Shader.PropertyToID("_MainTex");
 
@@ -43,22 +43,24 @@ namespace vadersb.utils.unity.jobs
 
             m_MeshFilter = GetComponent<MeshFilter>();
             Debug.Assert(m_MeshFilter != null);
-            
-            #if DEBUG
+
+#if DEBUG
             if (m_MeshFilter.sharedMesh != null)
             {
                 Debug.LogWarning("Mesh filter contains some mesh that will be overridden by sprite batcher!");
             }
-            #endif
+#endif
 
-            m_Mesh = new Mesh();
-            m_Mesh.indexFormat = IndexFormat.UInt32;
+            m_Mesh = new Mesh {
+                indexFormat = IndexFormat.UInt32
+            };
+
             m_Mesh.MarkDynamic();
 
             m_MeshFilter.sharedMesh = m_Mesh;
-            
+
             m_MaterialPropertyBlock = new MaterialPropertyBlock();
-            
+
             m_SpriteList.Init();
 
             RefreshMaterialPropertyTexture();
@@ -71,7 +73,7 @@ namespace vadersb.utils.unity.jobs
         {
             //Debug.Log("SpriteBatchRenderSetup.OnValidate()");
             bool applyPropertyBlock = m_MaterialPropertyBlock != null && m_MeshRenderer != null;
-            
+
             if (m_SpriteList != null)
             {
                 //m_SpriteList.Init();
@@ -98,7 +100,7 @@ namespace vadersb.utils.unity.jobs
 
         public Mesh Mesh => m_Mesh;
 
-        
+
         public MaterialPropertyBlock MaterialPropertyBlock => m_MaterialPropertyBlock;
 
 
@@ -125,11 +127,11 @@ namespace vadersb.utils.unity.jobs
             m_MaterialPropertyBlock.SetTexture(s_TextureProperty, texture);
         }
 
-        
+
         private void RefreshMaterialPropertyColor()
         {
             Debug.Assert(m_MaterialPropertyBlock != null);
-            
+
             m_MaterialPropertyBlock.SetColor(s_ColorProperty, m_Color);
         }
 
@@ -138,7 +140,7 @@ namespace vadersb.utils.unity.jobs
         {
             Debug.Assert(m_MaterialPropertyBlock != null);
             Debug.Assert(m_MeshRenderer != null);
-            
+
             m_MeshRenderer.SetPropertyBlock(m_MaterialPropertyBlock);
         }
     }

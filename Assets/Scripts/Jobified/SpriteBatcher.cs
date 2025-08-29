@@ -8,18 +8,18 @@ using UnityEngine.Rendering;
 
 namespace vadersb.utils.unity.jobs
 {
-    public class SpriteBatcher<T> where T: struct, IRenderable
+    public class SpriteBatcher<T> where T : struct, IRenderable
     {
         public const int BatchCountVertex = 256;
         public const int BatchCountIndex = 512;
-        
+
         private static readonly int VertexDataSize = Marshal.SizeOf<RenderableJobsUtils.VertexData>();
         private static readonly int QuadVertexDataSize = Marshal.SizeOf<RenderableJobsUtils.QuadVertexData>();
 
         private static readonly int IndexDataSize = sizeof(uint);
         private static readonly int QuadIndexDataSize = Marshal.SizeOf<RenderableJobsUtils.QuadIndexData>();
-        
-        
+
+
         private readonly Mesh m_Mesh;
 
         private NativeArray<RenderableJobsUtils.QuadVertexData> m_VerticesArray;
@@ -29,7 +29,7 @@ namespace vadersb.utils.unity.jobs
         private JobHandle m_IndexJobHandle;
 
         private bool m_IsBatching;
-        
+
 
         public SpriteBatcher(Mesh mesh)
         {
@@ -41,7 +41,7 @@ namespace vadersb.utils.unity.jobs
 
             Debug.Log("Index data size: " + IndexDataSize);
             Debug.Log("Quad index data size: " + QuadIndexDataSize);
-            
+
             Debug.Assert(mesh != null);
             Debug.Assert(mesh.indexFormat == IndexFormat.UInt32);
 
@@ -59,15 +59,15 @@ namespace vadersb.utils.unity.jobs
             Debug.Assert(m_IsBatching == false);
             Debug.Assert(itemsCount <= items.Length);
             Debug.Assert(itemsCount >= 0);
-            
+
             //arrays allocation
             m_VerticesArray = new NativeArray<RenderableJobsUtils.QuadVertexData>(itemsCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             m_IndicesArray = new NativeArray<RenderableJobsUtils.QuadIndexData>(itemsCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            
+
             //vertices job
             var vertexJob = new VertexJob(items, sprites, m_VerticesArray);
             m_VertexJobHandle = vertexJob.Schedule(itemsCount, batchCountVertex, jobToWaitFor);
-            
+
             //indices job
             var indexJob = new IndexJob(m_IndicesArray);
             m_IndexJobHandle = indexJob.Schedule(itemsCount, batchCountIndex, jobToWaitFor);
@@ -84,43 +84,43 @@ namespace vadersb.utils.unity.jobs
             }
 
             m_Mesh.Clear();
-            
+
             //vertex buffer
             m_VertexJobHandle.Complete();
 
             int verticesCount = m_VerticesArray.Length * 4;
 
             var verticesArray = m_VerticesArray.Reinterpret<RenderableJobsUtils.VertexData>(QuadVertexDataSize);
-            
+
             m_Mesh.SetVertexBufferParams(verticesCount, RenderableJobsUtils.VertexLayout);
-            
+
             //todo maybe add some flags
             m_Mesh.SetVertexBufferData(verticesArray, 0, 0, verticesCount);
 
-            
+
             //index buffer
             m_IndexJobHandle.Complete();
 
             int indicesCount = m_IndicesArray.Length * 6;
 
             var indicesArray = m_IndicesArray.Reinterpret<uint>(QuadIndexDataSize);
-            
+
             m_Mesh.SetIndexBufferParams(indicesCount, IndexFormat.UInt32);
             m_Mesh.SetIndexBufferData(indicesArray, 0, 0, indicesCount);
-            
-            
 
-            
+
+
+
             // SubMesh definition
             var meshDesc = new SubMeshDescriptor(0, indicesCount, MeshTopology.Triangles);
             m_Mesh.SetSubMesh(0, meshDesc);
-            
-            
+
+
             //arrays dispose
             m_VerticesArray.Dispose();
             m_IndicesArray.Dispose();
-            
-            
+
+
             //finally
             m_IsBatching = false;
         }
@@ -133,7 +133,7 @@ namespace vadersb.utils.unity.jobs
                 BatchFinalize();
             }
         }
-        
+
         //------------------------------------------------------------------------------
         //JOBS
         [BurstCompile]
@@ -144,7 +144,7 @@ namespace vadersb.utils.unity.jobs
 
             [ReadOnly]
             private NativeArray<SpriteData> m_Sprites;
-            
+
             [WriteOnly]
             private NativeArray<RenderableJobsUtils.QuadVertexData> m_Output;
 
@@ -173,23 +173,23 @@ namespace vadersb.utils.unity.jobs
                 float2 v3;
 
                 Color32 color;
-                
+
                 float2 t0;
                 float2 t1;
                 float2 t2;
                 float2 t3;
-                
+
                 if (item.IsVisible() == true)
                 {
                     var sprite = m_Sprites[item.GetSpriteIndex()];
-                    
+
                     //position
                     var worldPosition = item.GetPosition();
                     var scale = item.GetScale();
                     var rotationAngle = item.GetRotationAngle();
                     var rotationAngleSin = math.sin(rotationAngle);
                     var rotationAngleCos = math.cos(rotationAngle);
-                    
+
 
                     v0 = RenderableJobsUtils.CalculatePosition(sprite.v0, worldPosition, scale, rotationAngleSin, rotationAngleCos);
                     v1 = RenderableJobsUtils.CalculatePosition(sprite.v1, worldPosition, scale, rotationAngleSin, rotationAngleCos);
@@ -212,17 +212,17 @@ namespace vadersb.utils.unity.jobs
                     v1 = v0;
                     v2 = v0;
                     v3 = v0;
-                    
+
                     //color
                     color = new Color32(0, 0, 0, 0);
-                    
+
                     //texture coords
                     t0 = new Vector2(0.0f, 0.0f);
                     t1 = t0;
                     t2 = t0;
-                    t3 = t0;					
+                    t3 = t0;
                 }
-                
+
                 //output
                 m_Output[index] = new RenderableJobsUtils.QuadVertexData(
                     new RenderableJobsUtils.VertexData(new Vector3(v0.x, v0.y, 0.0f), color, t0),
@@ -252,7 +252,7 @@ namespace vadersb.utils.unity.jobs
                 uint vertex1 = vertex0 + 1;
                 uint vertex2 = vertex1 + 1;
                 uint vertex3 = vertex2 + 1;
-                
+
                 //index array indices
                 // int index0 = index * 6;
                 // int index1 = index0 + 1;
@@ -260,7 +260,7 @@ namespace vadersb.utils.unity.jobs
                 // int index3 = index2 + 1;
                 // int index4 = index3 + 1;
                 // int index5 = index4 + 1;
-                
+
                 //0 1 2
                 //2 1 3
 
@@ -273,7 +273,7 @@ namespace vadersb.utils.unity.jobs
                 // m_Output[index5] = vertex3;
 
                 m_Output[index] = new RenderableJobsUtils.QuadIndexData(vertex0, vertex1, vertex2, vertex2, vertex1, vertex3);
-                
+
             }
         }
     }

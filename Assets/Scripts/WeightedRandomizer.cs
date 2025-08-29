@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace vadersb.utils
@@ -28,7 +28,7 @@ namespace vadersb.utils
                 Reset();
                 return;
             }
-            
+
             m_Values = new List<T>(anotherRandomizer.m_Count);
             m_Weights = new List<float>(anotherRandomizer.m_Count);
             m_TotalWeight = anotherRandomizer.m_TotalWeight;

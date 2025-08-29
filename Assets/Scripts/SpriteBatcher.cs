@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -53,8 +53,10 @@ namespace vadersb.utils.unity
             ApplyMaterialPropertyBlock();
 
             //creating a mesh
-            m_Mesh = new Mesh();
-            m_Mesh.name = "SpriteBatcher dynamic mesh";
+            m_Mesh = new Mesh {
+                name = "SpriteBatcher dynamic mesh"
+            };
+
             m_Mesh.MarkDynamic();
 
             //mesh filter
@@ -164,9 +166,9 @@ namespace vadersb.utils.unity
                 }
             }
 
-            #if DEBUG
+#if DEBUG
             Debug.LogError("Failed to find sprite: " + sprite.name + " in atlas: " + m_SpriteAtlas.name);
-            #endif
+#endif
 
             return -1;
         }
@@ -183,9 +185,9 @@ namespace vadersb.utils.unity
                 }
             }
 
-            #if DEBUG
+#if DEBUG
             Debug.LogError("Failed to find sprite: " + spriteName + " in atlas: " + m_SpriteAtlas.name);
-            #endif
+#endif
 
             return -1;
         }
@@ -202,16 +204,16 @@ namespace vadersb.utils.unity
                 }
             }
 
-            #if DEBUG
+#if DEBUG
             Debug.LogError("Failed to find sprite: " + spriteName + " in atlas: " + m_SpriteAtlas.name);
-            #endif
+#endif
 
             return null;
         }
 
         //----------------------------------------------------------------------
         //Drawing Sprites
-        private static readonly Vector2 s_DefaultExtraUV = new Vector2(0.0f,0.0f);
+        private static readonly Vector2 s_DefaultExtraUV = new(0.0f,0.0f);
 
         public void DrawSprite(int spriteIndex, Vector2 position, Color color)
         {
@@ -240,7 +242,7 @@ namespace vadersb.utils.unity
 
                 curVertex += position; //translation
 
-                m_Dynamic_Vertices.Add(new Vector3(curVertex.x, curVertex.y, 0.0f));
+                m_Dynamic_Vertices.Add(curVertex);
 
                 //uv
                 var curUV = uvs[i];
@@ -306,7 +308,7 @@ namespace vadersb.utils.unity
 
                 curVertex += position; //translation
 
-                m_Dynamic_Vertices.Add(new Vector3(curVertex.x, curVertex.y, 0.0f));
+                m_Dynamic_Vertices.Add(curVertex);
 
                 //uv
                 var curUV = uvs[i];
@@ -375,7 +377,7 @@ namespace vadersb.utils.unity
 
                 curVertex += position; //translation
 
-                m_Dynamic_Vertices.Add(new Vector3(curVertex.x, curVertex.y, 0.0f));
+                m_Dynamic_Vertices.Add(curVertex);
 
                 //uv
                 var curUV = uvs[i];
@@ -443,7 +445,7 @@ namespace vadersb.utils.unity
 
                 curVertex += position; //translation
 
-                m_Dynamic_Vertices.Add(new Vector3(curVertex.x, curVertex.y, 0.0f));
+                m_Dynamic_Vertices.Add(curVertex);
 
                 //uv
                 var curUV = uvs[i];
@@ -476,53 +478,6 @@ namespace vadersb.utils.unity
             }
 
             m_Dynamic_IndexOffset += vertices.Length;
-        }
-
-        public void DrawSpriteQuad(SpriteQuad spriteQuad)
-        {
-            //-----
-            //index test
-            if (spriteQuad == null)
-            {
-#if DEBUG
-                Debug.LogError("spriteQuad is null!");
-#endif
-                return;
-            }
-
-            //-----
-            //Adding sprite geometry
-
-            for (int i = 0; i < SpriteQuad.VerticesCount; i++)
-            {
-                //vertex position
-                m_Dynamic_Vertices.Add(spriteQuad.m_Vertices[i]);
-
-                //uv
-                m_Dynamic_UV1.Add(spriteQuad.m_UV1[i]);
-
-                //color
-                m_Dynamic_Colors.Add(spriteQuad.m_Colors[i]);
-            }
-
-            //uv2
-            if (m_UseExtendedUVs == true)
-            {
-                for (int i = 0; i < SpriteQuad.VerticesCount; i++)
-                {
-                    m_Dynamic_UV2.Add(spriteQuad.m_UV2[i]);
-                    m_Dynamic_UV3.Add(spriteQuad.m_UV3[i]);
-                    m_Dynamic_UV4.Add(spriteQuad.m_UV4[i]);
-                }
-            }
-
-            for (int i = 0; i < SpriteQuad.IndicesCount; i++)
-            {
-                //index
-                m_Dynamic_Triangles.Add(spriteQuad.m_Triangles[i] + m_Dynamic_IndexOffset);
-            }
-
-            m_Dynamic_IndexOffset += SpriteQuad.VerticesCount;
         }
 
         public void DrawMesh(Vector2[] vertices, Vector2[] uv1, Color[] colors, int[] triangles, Vector2[] uv2 = null, Vector2[] uv3 = null, Vector2[] uv4 = null)
@@ -840,9 +795,7 @@ namespace vadersb.utils.unity
 
         private void ApplyMaterialPropertyBlock()
         {
-            var myRenderer = GetComponent<MeshRenderer>();
-
-            if (myRenderer != null)
+            if (TryGetComponent<MeshRenderer>(out var myRenderer))
             {
                 myRenderer.SetPropertyBlock(m_MaterialPropertyBlock, 0);
             }

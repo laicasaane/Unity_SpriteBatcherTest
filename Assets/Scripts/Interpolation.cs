@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace vadersb.utils
 {
@@ -97,15 +97,15 @@ namespace vadersb.utils
             return new Vector2(CubicSmooth(prevPoint.x, startPoint.x, endPoint.x, nextPoint.x, factor),
                 CubicSmooth(prevPoint.y, startPoint.y, endPoint.y, nextPoint.y, factor));
         }
-        
+
         public static Vector3 CubicSmooth(Vector3 prevPoint, Vector3 startPoint, Vector3 endPoint, Vector3 nextPoint, float factor)
         {
             return new Vector3(CubicSmooth(prevPoint.x, startPoint.x, endPoint.x, nextPoint.x, factor),
                 CubicSmooth(prevPoint.y, startPoint.y, endPoint.y, nextPoint.y, factor),
                 CubicSmooth(prevPoint.z, startPoint.z, endPoint.z, nextPoint.z, factor));
         }
-        
-        
+
+
         //some special cases
         public static float EaseIn(float value)
         {

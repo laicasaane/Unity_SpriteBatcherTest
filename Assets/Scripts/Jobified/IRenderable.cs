@@ -7,16 +7,16 @@ namespace vadersb.utils.unity.jobs
     {
         //visibility
         bool IsVisible();
-    
+
         //sprite index
         int GetSpriteIndex();
-        
+
         //transform
         float2 GetPosition();
         float2 GetScale();
         float GetRotationAngle();
-        
+
         //color
         Color GetColor();
-    }	
+    }
 }

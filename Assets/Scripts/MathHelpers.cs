@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 
 namespace vadersb.utils
@@ -17,14 +17,14 @@ namespace vadersb.utils
 
         public const float ConvertAngle_ToRadians = Pi / 180.0f;
         public const float ConvertAngle_ToDegrees = 180.0f / Pi;
-        
-        
+
+
         //================
         //random functions
         //================
-        
+
         #region Random Functions
-        
+
         /// <summary>
         ///   <para>Returns random float in range [0.0; 1.0]</para>
         /// </summary>
@@ -67,7 +67,7 @@ namespace vadersb.utils
         {
             return Random.Range(center - radius, center + radius);
         }
-        
+
         /// <summary>
         ///   <para>Returns random int in specified range [min; max]</para>
         /// </summary>
@@ -126,10 +126,10 @@ namespace vadersb.utils
 
             return probability >= Random.Range(0.0f, 1.0f);
         }
-        
+
         //Random Functions
-        #endregion 
-        
+        #endregion
+
         //=====
         //clamp
         //=====
@@ -149,7 +149,7 @@ namespace vadersb.utils
 
             return valueToClamp;
         }
-        
+
         /// <summary>
         ///   <para>Clamps float number into [0.0; 1.0] range</para>
         /// </summary>
@@ -176,10 +176,10 @@ namespace vadersb.utils
             {
                 factor -= 1.0f;
             }
-            
+
             return factor;
         }
-        
+
         /// <summary>
         ///   <para>Clamps float number into [0.0; 2Pi] range</para>
         /// </summary>
@@ -217,8 +217,8 @@ namespace vadersb.utils
 
             return angle;
         }
-        
-        
+
+
         //======
         //factor
         //======
@@ -242,9 +242,9 @@ namespace vadersb.utils
 
         public static float Factor_FromRange_Clamped(float rangeFrom, float rangeTo, float curValue)
         {
-            return MathHelpers.Clamp_Factor(Factor_FromRange(rangeFrom, rangeTo, curValue));
+            return Clamp_Factor(Factor_FromRange(rangeFrom, rangeTo, curValue));
         }
-        
+
 
         /// <summary>
         ///   <para>Returns a sub-factor of a value inside specified sub-factor range.</para>
@@ -258,9 +258,9 @@ namespace vadersb.utils
 
             if (length <= 0.0f)
             {
-                #if DEBUG
+#if DEBUG
                 Debug.LogWarning("subfactor length <= 0.0f. subFrom: " + subFrom + " subTo: " + subTo);
-                #endif
+#endif
                 return 1.0f;
             }
 
@@ -279,7 +279,7 @@ namespace vadersb.utils
                 while (factor < 0.0f) factor += 1.0f;
                 while (factor > 1.0f) factor -= 1.0f;
             }
-            
+
             if (factor < 0.5f)
             {
                 return factor * 2.0f;
@@ -295,12 +295,12 @@ namespace vadersb.utils
         {
             if (repetitionsCount < 2)
             {
-                #if DEBUG
+#if DEBUG
                 Debug.LogError("repetitionsCount: " + repetitionsCount);
-                #endif
+#endif
                 return factor;
             }
-            
+
             float repetitionsCountFloat = repetitionsCount;
             float curStep = (int)(repetitionsCountFloat * factor);
 
@@ -330,7 +330,7 @@ namespace vadersb.utils
             }
 
             return result;
-            
+
         }
 
         //========
@@ -353,7 +353,7 @@ namespace vadersb.utils
 
             return result;
         }
-        
+
         /// <summary>
         ///   <para>Returns an element index in a sequence [0; stepsCount - 1] based on current time and full time. Loops if current time is out of bounds.</para>
         /// </summary>
@@ -379,7 +379,7 @@ namespace vadersb.utils
 
             return result;
         }
-        
+
         /// <summary>
         ///   <para>Returns an element index in a sequence [0; stepsCount - 1] based on factor. Clamps if factor is out of bounds.</para>
         /// </summary>
@@ -395,7 +395,7 @@ namespace vadersb.utils
 
             return result;
         }
-        
+
         /// <summary>
         ///   <para>Returns an element index in a sequence [0; stepsCount - 1] based on factor. Loops if factor is out of bounds.</para>
         /// </summary>
@@ -423,12 +423,12 @@ namespace vadersb.utils
 
         public static float Sequence_Interpolated_Looped(float curFactor, int stepsCount, out int stepFrom, out int stepTo)
         {
-            #if DEBUG
+#if DEBUG
             if (curFactor < 0.0f || curFactor >= 1.0f)
             {
                 Debug.LogError("invalid curFactor: " + curFactor + ". factor should be clamped as looped! [0.0f; 1.0f)");
             }
-            #endif
+#endif
 
             if (stepsCount < 2)
             {
@@ -530,7 +530,7 @@ namespace vadersb.utils
             b = tmp;
         }
 
-        
+
         //====
         //misc
         //====
@@ -549,6 +549,6 @@ namespace vadersb.utils
 
             return digits;
         }
-        
+
     }
 }
